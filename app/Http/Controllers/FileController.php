@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use Storage;
 use App\File;
+use App\Task;
+use App\Http\Requests\FileRequest;
 use Illuminate\Http\Request;
 
 class FileController extends Controller
@@ -12,9 +16,13 @@ class FileController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Task $task)
     {
-        //
+      $data = [
+      'task' => $task
+      ];
+
+      return view('file.index', $data);
     }
 
     /**
@@ -22,9 +30,13 @@ class FileController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Task $task)
     {
-        //
+      $data = [
+      'task' => $task
+      ];
+
+      return view('file.create', $data);
     }
 
     /**
@@ -33,9 +45,19 @@ class FileController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(FileRequest $request, Task $task)
     {
-        //
+      $file = File::create([
+        'name'          =>  $request->name,
+        'task_id'       =>  $task->id,
+        ]);
+
+      $extension = strtolower($request->file('file')->getClientOriginalExtension());
+
+      Storage::put('public/files/tasks/'.$file->id.'.'.$extension, file_get_contents($request->file('file')->getRealPath()));
+      $file->update(['url' => 'files/tasks/'.$file->id.'.'.$extension, 'extension' => $extension]);
+
+      return redirect()->route('file.index', $task->id)->with('status','Se pudo subir el archivo satisfactoriamente');
     }
 
     /**
@@ -80,6 +102,19 @@ class FileController extends Controller
      */
     public function destroy(File $file)
     {
-        //
+      if(Auth::id() == $file->task->user_id){
+        $task = $file->task;
+        $exists = Storage::exists('public/'.$file->url);
+
+        if($exists){
+          Storage::delete('public/'.$file->url);
+        }
+
+        $file->delete();    
+      }else{
+        return redirect()->back()->withErrors(['La archivo solo puede ser eliminado por el autor de la mismo']);
+      }
+
+      return redirect()->route('file.index', $task->id)->with('status','Se pudo eliminar el archivo satisfactoriamente');
     }
-}
+  }

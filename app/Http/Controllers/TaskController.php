@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use PDF;
+use Auth;
+use Excel;
+use Storage;
+use App\User;
 use App\Task;
 use App\Http\Requests\TaskRequest;
 use Illuminate\Http\Request;

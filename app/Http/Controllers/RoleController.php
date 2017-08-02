@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\Role;
+use App\User;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -14,7 +16,13 @@ class RoleController extends Controller
      */
     public function index()
     {
-        //
+        $roles = Role::all();
+        
+        $data = [
+            'roles' => $roles
+        ];
+
+        return view('role.index', $data);
     }
 
     /**
@@ -55,9 +63,16 @@ class RoleController extends Controller
      * @param  \App\Role  $role
      * @return \Illuminate\Http\Response
      */
-    public function edit(Role $role)
+    public function edit(User $user)
     {
-        //
+        $roles  = Role::getNotSelected($user);
+
+        $data = [
+            'user'  => $user,
+            'roles' => $roles
+        ];
+
+        return view('role.edit', $data);
     }
 
     /**
@@ -67,9 +82,13 @@ class RoleController extends Controller
      * @param  \App\Role  $role
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Role $role)
+    public function update(Request $request, User $user)
     {
-        //
+        foreach ($request->roles as $role) {
+            $user->roles()->attach($role);
+        }
+
+        return redirect()->route('user.show',$user->id)->with('status','Se pudieron guardar los roles satisfactoriamente');
     }
 
     /**
@@ -78,8 +97,11 @@ class RoleController extends Controller
      * @param  \App\Role  $role
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Role $role)
+    public function destroy($id)
     {
-        //
+        $user = Auth::user();
+        $user->roles()->detach($id);
+
+        return redirect()->route('user.show',$user->id)->with('status','Se pudo eliminar el rol satisfactoriamente');
     }
 }

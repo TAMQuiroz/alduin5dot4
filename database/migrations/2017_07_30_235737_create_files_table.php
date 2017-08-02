@@ -17,10 +17,10 @@ class CreateFilesTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->integer('task_id')->unsigned();
-            $table->string('url');
+            $table->string('url')->nullable();
             $table->string('extension')->nullable();
-            $table->string('feedback');
-            $table->integer('version');
+            $table->string('feedback')->nullable();
+            $table->integer('version')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

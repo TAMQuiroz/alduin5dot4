@@ -61,7 +61,9 @@
                             </div>
                             @endforeach
                         @else
-                            No se encontraron archivos
+                            <div class="col-md-12">
+                                No se encontraron archivos
+                            </div>
                         @endif
                         </div>
                     </div>

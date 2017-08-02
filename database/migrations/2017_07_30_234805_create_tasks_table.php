@@ -19,7 +19,7 @@ class CreateTasksTable extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->date('date');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->string('url')->nullable();
             $table->softDeletes();
             $table->timestamps();
