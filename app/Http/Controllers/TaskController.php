@@ -116,7 +116,7 @@ class TaskController extends Controller
 
       $exists = Storage::exists('public/'.$task->image);
 
-      if($exists){
+      if($task->image && $exists){
         Storage::delete('public/'.$task->image);
       }
       
